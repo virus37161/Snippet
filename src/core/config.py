@@ -6,10 +6,12 @@ from pydantic_settings import BaseSettings
 
 
 class AppSettings(BaseSettings):
-    app_port: int = 7000
+    app_port: int = 8000
     app_host: str = 'localhost'
     reload: bool = True
     cpu_count: int | None = None
+    jwt_secret: str = 'secret'
+    algorithm: str = 'HS256'
     postgres_dsn: PostgresDsn = MultiHostUrl(
         'postgresql+asyncpg://postgres:Gertop_virus37@localhost/snippet_base')
     class Config:
