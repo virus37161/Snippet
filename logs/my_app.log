@@ -1,0 +1,8 @@
+[DEBUG|selector_events|L64] 2024-09-09T12:59:05+0300: Using selector: SelectSelector
+[ERROR|main|L54] 2024-09-09T12:59:16+0300: http://localhost:5000/favicon.ico | Error in application: (sqlalchemy.dialects.postgresql.asyncpg.Error) <class 'asyncpg.exceptions.DataError'>: invalid input for query argument $1: 'favicon.ico' (invalid UUID 'favicon.ico': length must be between 32..36 characters, got 11)
+[SQL: SELECT snippet.id, snippet.text, snippet.user_id 
+FROM snippet 
+WHERE snippet.id = $1::UUID]
+[parameters: ('favicon.ico',)]
+(Background on this error at: https://sqlalche.me/e/20/dbapi)
+[ERROR|main|L63] 2024-09-09T12:59:27+0300: http://localhost:5000/post | Error in application: 401: Not authenticated

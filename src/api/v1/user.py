@@ -7,6 +7,8 @@ from fastapi import HTTPException
 from auth.auth import reg_user, authenticate_user, create_access_token, user_dependency
 from db.db import db_dependency
 from schemas.user import UserLoginSchema, UserRegisterSchema
+from models.role import RoleList
+from typing import List
 
 # Создаем APIRouter с префиксом "/user" и тегом 'user' для отображения в документации
 user_router = APIRouter(prefix="/user", tags=['user'])
@@ -52,9 +54,10 @@ def write_notification(email: str, message=""):
         email_file.write(content)
 
 
-def has_role(required_role: list[str]):
+def has_role(required_roles: List[RoleList]):
+    required_roles = [required_role for required_role in required_roles]
     def role_checker(current_user: user_dependency):
-        if current_user["role"] not in required_role:
+        if current_user["role"] not in required_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not enough permissions"
@@ -63,7 +66,3 @@ def has_role(required_role: list[str]):
 
     return role_checker
 
-@user_router.post("/send-notification/{email}", dependencies=[Depends(has_role(["admin"]))])
-async def send_notification(email: str, background_tasks: BackgroundTasks):
-    background_tasks.add_task(write_notification, email, message="some notification")
-    return {"message": "Notification sent in the background"}

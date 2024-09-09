@@ -11,5 +11,6 @@ class User(Base):
     email = Column(String(128), unique=True, index=True, nullable=False)
     hashed_password = Column(String(1024), nullable=False)
     salt = Column(String(1024), nullable=False, unique=True, index=True)
-    role_id = Column(Integer, ForeignKey('role.id'))
+    role_id = Column(Integer, ForeignKey('role.id'), default = 1)
     role = relationship("Role", back_populates="users")
+    snippets = relationship("Snippet", back_populates='users')

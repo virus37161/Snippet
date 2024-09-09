@@ -4,11 +4,11 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette import status
 from starlette.exceptions import HTTPException
-
+from typing import List
 from auth.auth import authenticate_user, create_access_token, reg_user, user_dependency
 from db.db import db_dependency
 from schemas.user import UserRegisterSchema, UserLoginSchema
-
+from models.role import RoleList
 auth_router = APIRouter(prefix="/auth", tags=['auth'])
 
 @auth_router.post("/login")
@@ -21,8 +21,9 @@ async def login_for_access_token(db: db_dependency,
            detail="Incorrect username or password",
            headers={"WWW-Authenticate": "Bearer"},
        )
+
    access_token = create_access_token(
-       data={"sub": user.email, "role": user.role.name.value}
+       data={"sub": user.email, "role": user.role.name.value, 'user_id': user.id}
    )
    return {"access_token": access_token, "token_type": "bearer"}
 
@@ -35,8 +36,9 @@ async def token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Could not validate user.")
+
     access_token = create_access_token(
-        data={"sub": user.email, "role": user.role.name.value}
+        data={"sub": user.email, "role": user.role.name.value, 'user_id': user.id}
     )
     return {'access_token': access_token, 'token_type': 'bearer'}
 
@@ -44,9 +46,10 @@ async def token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 async def get_current_user(user: user_dependency):
     return {"user": user}
 
-def has_role(required_role: list[str]):
+def has_role(required_roles: List[RoleList]):
+    required_roles = [required_role.name for required_role in required_roles]
     def role_checker(current_user: user_dependency):
-        if current_user["role"] not in required_role:
+        if current_user["role"] not in required_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Not enough permissions"

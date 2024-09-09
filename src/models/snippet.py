@@ -7,3 +7,5 @@ class Snippet(Base):
     __tablename__ = "snippet"
     id = Column(UUID, primary_key=True, index=True, default=str(uuid.uuid4()))
     text = Column(String(256), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    users = relationship('User', back_populates="snippets")
